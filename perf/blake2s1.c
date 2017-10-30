@@ -19,7 +19,7 @@ main(int argc, char **argv){
 		data[i] = 0;
 	}
 
-	const int n = 10000000;
+	const int n = 1000000;
 	struct timespec start, end;
 	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 	for(int i = 0; i < n; i++){
@@ -31,5 +31,8 @@ main(int argc, char **argv){
 	clock_gettime(CLOCK_MONOTONIC_RAW, &end);
 	double hps = n/time_diff(&start, &end);
 	printf("%.3f KH/s (%.3f MB/s)\n", hps/1.0e3, 64 * hps/1.0e6);
+	char hex[64];
+	blake2s1_hex(data, hex);
+	printf("%.*s\n", sizeof(hex), hex);
 }
 
