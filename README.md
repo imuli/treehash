@@ -29,7 +29,7 @@ var hex = blake2s1.toHex(hashtree(theTree));
 
 ### Performance
 
-See perf/index.html.
+See `perf/index.html`.
 
 ```
 Processor	Environment	MH/s	MB/s
@@ -39,7 +39,9 @@ i5-3337U 1.8GHz	Chromium 61	1.50	96
 
 ### Tests
 
-TODO (hand checked outputs against reference version of b2sum)
+Tests may be found in `test/`.
+
+* blake2s1 salt is untested due to lack of support in the `b2sum` utility.
 
 ## Unlicenced
 
