@@ -32,9 +32,9 @@ var hex = blake2s1.toHex(hashtree(theTree));
 See `perf/index.html`.
 
 ```
-Processor	Environment	MH/s	MB/s
-i5-3337U 1.8GHz	node v6.9.5	1.58	101
-i5-3337U 1.8GHz	Chromium 61	1.50	96
+Processor	Environment	Hash Function 	MH/s	MB/s
+i5-3337U 1.8GHz	node v6.9.5	blake2s1	1.58	101
+i5-3337U 1.8GHz	Chromium 61	blake2s1	1.50	96
 ```
 
 ### Tests
