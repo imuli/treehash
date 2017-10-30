@@ -31,12 +31,13 @@ var hex = blake2s1.toHex(hashtree(theTree));
 
 Performance may be tested with `make perf` or by loading `perf/index.html`.
 
-```
-Processor	Environment	Hash Function 	MH/s	MB/s
-i5-3337U 1.8GHz	node v6.9.5	blake2s1	1.58	101
-i5-3337U 1.8GHz	Chromium 61	blake2s1	1.50	96
-i5-3337U 1.8GHz	clang v3.9.1	blake2s1	5.00	320
-```
+|    Processor    | Environment  | Lang |   Hash   | MH/s | MB/s |
+| --------------- | ------------ | ---- | -------- | ---- | ---- |
+| i5-3337U 1.8GHz | clang v3.9.1 | C    | blake2s1 | 5.00 | 320  |
+| E5-2603 1.6GHz  | clang v3.7.1 | C    | blake2s1 | 3.45 | 220  |
+| i5-3337U 1.8GHz | node v6.9.5  | js   | blake2s1 | 1.58 | 101  |
+| i5-3337U 1.8GHz | Chromium 61  | js   | blake2s1 | 1.50 | 96   |
+| E5-2603 1.6GHz  | node v4.6.0  | js   | blake2s1 | 1.30 | 85   |
 
 ### Tests
 
