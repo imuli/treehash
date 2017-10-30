@@ -29,7 +29,7 @@ var hex = blake2s1.toHex(hashtree(theTree));
 
 ### Performance
 
-See files in `perf/`.
+Performance may be tested with `make perf` or by loading `perf/index.html`.
 
 ```
 Processor	Environment	Hash Function 	MH/s	MB/s
@@ -40,7 +40,7 @@ i5-3337U 1.8GHz	clang v3.9.1	blake2s1	4.85	310
 
 ### Tests
 
-Tests may be found in `test/`.
+Tests may be run with `make test` or by loading `test/index.html`.
 
 * blake2s1 salt is untested due to lack of support in the `b2sum` utility.
 
