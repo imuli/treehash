@@ -1,5 +1,5 @@
 if(typeof blake2s1 == 'undefined') blake2s1 = require('../blake2s1.js');
-if(typeof blake2s1_vectors == 'undefined') blake2s1_vectors = require('./blake2s1_vectors.js');
+if(typeof blake2s1_vectors == 'undefined') blake2s1_vectors = require('./blake2s1_vectors.jsonp');
 
 // start with all zeros
 var h = [ 0x0,0x0,0x0,0x0, 0x0,0x0,0x0,0x0 ];

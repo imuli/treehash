@@ -13,4 +13,4 @@ for i in $(seq 1 20); do
 	data=$hash$hash
 done
 echo ']; if(typeof module != "undefined") module.exports = blake2s1_vectors;'
-) > blake2s1_vectors.js
+) > blake2s1_vectors.jsonp

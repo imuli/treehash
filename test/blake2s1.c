@@ -23,9 +23,9 @@ main(int argc, char **argv){
 	char *buf = NULL;
 	size_t n = 0;
 
-	FILE *f = fopen("blake2s1_vectors.js", "r");
+	FILE *f = fopen("blake2s1_vectors.jsonp", "r");
 	if(f == NULL){
-		fprintf(stderr, "Must be run in the same directory as blake2s1_vectors.js\n");
+		fprintf(stderr, "Must be run in the same directory as blake2s1_vectors.jsonp\n");
 		return 1;
 	}
 
