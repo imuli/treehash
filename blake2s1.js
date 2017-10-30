@@ -1168,6 +1168,8 @@ var blake2s1 = {
 		v5 ^= v10;
 		v5 = v5 << 25 | v5 >>> 7;
 
+//		console.log([v0,v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15].map((a) => (a < 0 ? a + 0x100000000 : a).toString(16)).join(" "));
+
 		// it is literally 4x as fast to reiterate the constants here
 		return [
 			0x6b08e647 ^ v0 ^ v8,
