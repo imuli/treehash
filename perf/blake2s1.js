@@ -4,13 +4,14 @@ var h = [ 0x0,0x0,0x0,0x0, 0x0,0x0,0x0,0x0 ];
 var n = 1000000;
 var start = new Date();
 for(var i = 0; i < n; i++){
-	h = blake2s1.hash(h.concat(h), [0,0,0,0]);
+	for(var j=0; j < 8; j++) h[8+j] = h[j];
+	blake2s1.hash(h, [0,0,0,0], h);
 }
 var end = new Date();
 
 var khps = n/(end.getTime()-start.getTime());
 var speed = khps + " KH/s ("  + khps * 64 / 1000 + " MB/s)";
-var hash = blake2s1.toHex(h);
+var hash = blake2s1.toHex(h.slice(0,8));
 
 if(typeof document == 'undefined'){
 	console.log(speed);

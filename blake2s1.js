@@ -10,7 +10,7 @@
 // Thanks to <https://github.com/dchest/blake2s-js>.
 
 var blake2s1 = {
-	hash : (m, salt) => {
+	hash : (m, salt, out) => {
 		var	v0 = 0x6b08e647, // 0x6a09e667 ^ 0x01010020, no key and digest length of 32 bytes
 			v1 = 0xbb67ae85, // no leaf lengeth
 			v2 = 0x3c6ef372, // no node offset
@@ -1171,16 +1171,15 @@ var blake2s1 = {
 //		console.log([v0,v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15].map((a) => (a < 0 ? a + 0x100000000 : a).toString(16)).join(" "));
 
 		// it is literally 4x as fast to reiterate the constants here
-		return [
-			0x6b08e647 ^ v0 ^ v8,
-			0xbb67ae85 ^ v1 ^ v9,
-			0x3c6ef372 ^ v2 ^ v10,
-			0xa54ff53a ^ v3 ^ v11,
-			0x510e527f ^ v4 ^ v12 ^ salt[0],
-			0x9b05688c ^ v5 ^ v13 ^ salt[1],
-			0x1f83d9ab ^ v6 ^ v14 ^ salt[2],
-			0x5be0cd19 ^ v7 ^ v15 ^ salt[3],
-		];
+		out[0] = 0x6b08e647 ^ v0 ^ v8;
+		out[1] = 0xbb67ae85 ^ v1 ^ v9;
+		out[2] = 0x3c6ef372 ^ v2 ^ v10;
+		out[3] = 0xa54ff53a ^ v3 ^ v11;
+		out[4] = 0x510e527f ^ v4 ^ v12 ^ salt[0];
+		out[5] = 0x9b05688c ^ v5 ^ v13 ^ salt[1];
+		out[6] = 0x1f83d9ab ^ v6 ^ v14 ^ salt[2];
+		out[7] = 0x5be0cd19 ^ v7 ^ v15 ^ salt[3];
+		return out;
 	},
 
 	fromBytes : (b) => {

@@ -5,7 +5,7 @@ if(typeof blake2s1_vectors == 'undefined') blake2s1_vectors = require('./blake2s
 var h = [ 0x0,0x0,0x0,0x0, 0x0,0x0,0x0,0x0 ];
 for(var i = 0; i < blake2s1_vectors.length; i++){
 	// the next hash is the hash of this concatenated to itself
-	h = blake2s1.hash(h.concat(h), [0,0,0,0]);
+	blake2s1.hash(h.concat(h), [0,0,0,0], h);
 
 	var hex = blake2s1.toHex(h);
 	var output;

@@ -11,7 +11,7 @@ BLAKE2s specialized to take a single input block, which is two of it's outputs.
 
 A javascript implementation may be found in `blake2s1.js`.
 
-* `hash = blake2s1.hash(data, salt)` hashes 16 32-bit words of data and 4 words of salt/personalization into 8 words of hash.
+* `hash = blake2s1.hash(data, salt, hash)` hashes 16 32-bit words of data and 4 words of salt/personalization into 8 words of hash, and returns the hash.
 * `words = blake2s1.fromBytes(bytes)` reads byte-sized numbers into 32-bit words that blake2s1 can process.
 * `bytes = blake2s1.toBytes(words)` does the opposite, unpacks 32-bit words into an array of bytes.
 * `hexstring = blake2s1.toHex(words)` renders a hexdecimal string suitable for displaying a hash.
@@ -22,7 +22,7 @@ For example, the outline of a function to hash a tree:
 function hashtree(tree){
 	if(isleaf(tree)) return leafTo8Words(tree);
 	var salt = nodeDataTo4Words(tree);
-	return blake2s1.hash(hashtree(tree.left).concat(hashtree(tree.right)), salt);
+	return blake2s1.hash(hashtree(tree.left).concat(hashtree(tree.right)), salt, []);
 }
 var hex = blake2s1.toHex(hashtree(theTree));
 ```
@@ -34,10 +34,10 @@ Performance may be tested with `make perf` or by loading `perf/index.html`.
 |    Processor    | Environment  | Lang |   Hash   | MH/s | MB/s |
 | --------------- | ------------ | ---- | -------- | ---- | ---- |
 | i5-3337U 1.8GHz | clang v3.9.1 | C    | blake2s1 | 5.00 | 320  |
+| i5-3337U 1.8GHz | node v6.9.5  | js   | blake2s1 | 3.51 | 225  |
 | E5-2603 1.6GHz  | clang v3.7.1 | C    | blake2s1 | 3.45 | 220  |
-| i5-3337U 1.8GHz | node v6.9.5  | js   | blake2s1 | 1.58 | 101  |
-| i5-3337U 1.8GHz | Chromium 61  | js   | blake2s1 | 1.50 | 96   |
-| E5-2603 1.6GHz  | node v4.6.0  | js   | blake2s1 | 1.30 | 85   |
+| i5-3337U 1.8GHz | Chromium 61  | js   | blake2s1 | 3.05 | 196  |
+| E5-2603 1.6GHz  | node v4.6.0  | js   | blake2s1 | 2.37 | 152  |
 
 ### Tests
 
