@@ -14,11 +14,14 @@ jstest: $(JStest)
 bin/test_c_%: %.c test/%.c %.h | bin
 	$(CC) $(CFLAGS) -o $@ $*.c test/$*.c
 
-test/%.c.test: bin/test_c_%
+test/%_vectors.jsonp: test/generate_test_vectors.sh
+	(cd test; ./generate_test_vectors.sh)
+
+test/%.c.test: bin/test_c_% test/%_vectors.jsonp
 	@echo $* C Test:
 	@(cd test;../$<)
 
-test/%.js.test: test/%.js %.js
+test/%.js.test: test/%.js %.js test/%_vectors.jsonp
 	@echo $* JS Test:
 	@node $<
 
