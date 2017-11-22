@@ -52,7 +52,7 @@ rotr32(const uint32_t w, const unsigned c){
 #define MASKe 0xffffffffUL
 
 void
-blake2s1(const uint32_t m[16], const uint32_t salt[16], uint32_t out[8]){
+blake2s1(const uint32_t m[16], const uint32_t salt[4], uint32_t out[8]){
 	uint32_t v[16] = {
 		IV[0] ^ MASK0,
 		IV[1],
