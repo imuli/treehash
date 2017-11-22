@@ -1207,6 +1207,8 @@ var blake2s1 = {
 		return b;
 	},
 
+	zero : [ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, ],
+
 };
 
 if(typeof module !== 'undefined' && module.exports)

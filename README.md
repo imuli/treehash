@@ -48,9 +48,12 @@ For example, the outline of a function to hash a tree:
 
 ```js
 function hashtree(tree){
-	if(isleaf(tree)) return leafTo8Words(tree);
 	var salt = nodeDataTo4Words(tree);
-	return blake2s1.hash(hashtree(tree.left).concat(hashtree(tree.right)), salt, []);
+	if(isleaf(tree)){
+		return blake2s1.hash(blake2s1.zero, salt, []);
+	} else {
+		return blake2s1.hash(hashtree(tree.left).concat(hashtree(tree.right)), salt, []);
+	}
 }
 var hex = blake2s1.toHex(hashtree(theTree));
 ```
