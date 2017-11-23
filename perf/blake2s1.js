@@ -1,6 +1,6 @@
 if(typeof blake2s1 == 'undefined') blake2s1 = require('../blake2s1.js');
 
-var h = [ 0x0,0x0,0x0,0x0, 0x0,0x0,0x0,0x0 ];
+var h = blake2s1.zero.slice(8);
 var n = 1000000;
 var start = new Date();
 for(var i = 0; i < n; i++){
