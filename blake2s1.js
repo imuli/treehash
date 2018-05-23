@@ -12,7 +12,7 @@
 var blake2s1 = {
 	hash : (m, salt, out) => {
 		var	v0 = 0x6b08e647, // 0x6a09e667 ^ 0x01010020, no key and digest length of 32 bytes
-			v1 = 0xbb67ae85, // no leaf lengeth
+			v1 = 0xbb67ae85, // no leaf length
 			v2 = 0x3c6ef372, // no node offset
 			v3 = 0xa54ff53a, // no node offset, no node depth, no inner length
 			v4 = 0x510e527f ^ salt[0],
