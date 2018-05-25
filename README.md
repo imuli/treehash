@@ -1,13 +1,16 @@
 # treehash
 
-Hashes designed for binary trees.
-Used properly, identical binary trees will hash to the same value,
-even if some parts of the tree are known only by their hash.
+Hashes designed for binary trees and other directed acyclic graphs.
+Used properly, identical graphs will hash to the same value,
+even if some parts of the graph are known only by their hash.
 
 ## blake2s1
 
-Currently this consists of C and Javascript implementations of blake2s1,
+Currently this consists of C, Haskell, and Javascript implementations of blake2s1,
 BLAKE2s specialized to take a single input block, which is two of it's outputs.
+
+Differentiation of node types is typically done with the salt,
+which can also be used to incorporate small amounts of data.
 
 ### C
 
@@ -15,7 +18,7 @@ The C implementation may be found in `blake2s1.c` and `blake2s1.h`.
 
 The prototype are straight-forward:
 
-* `void blake2s1(const uint32_t m[16], const uint32_t salt[16], uint32_t out[8]);`
+* `void blake2s1(const uint32_t m[16], const uint32_t salt[4], uint32_t out[8]);`
 
   Hash 16 32-bit words in `m` and 4 words of salt/personalization, into 8 words of hash in `out`.
   It is safe for `out` to overlap with `m`.
