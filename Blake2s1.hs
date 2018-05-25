@@ -1,6 +1,6 @@
 module Blake2s1
   ( Hash(..)
-  , Salt(..)
+  , Salt
   , zero
   , hash
   , toList
@@ -27,20 +27,20 @@ type Salt = ( Word32, Word32, Word32, Word32 )
 
 -- half of G
 mix :: (Word32, Word32, Word32, Word32) -> Word32 -> Int -> Int -> (Word32, Word32, Word32, Word32)
-mix (a,b,c,d) w s r =
+mix (a,b,c,d) w rd rb =
   let a' = a + w + b
-      d' = (d `xor` a') `rotateR` s
+      d' = (d `xor` a') `rotateR` rd
       c' = c + d'
-      b' = (b `xor` c') `rotateR` r
+      b' = (b `xor` c') `rotateR` rb
    in (a',b',c',d')
 
 -- half of a bunch of G that don't use the same data
 group :: State -> (Word32, Word32, Word32, Word32) -> Int -> Int -> State
-group (a,b,c,d, e,f,g,h, i,j,k,l, m,n,o,p) (w,x,y,z) s r =
-  let (a', b', c', d') = mix (a,b,c,d) w s r
-      (e', f', g', h') = mix (e,f,g,h) x s r
-      (i', j', k', l') = mix (i,j,k,l) y s r
-      (m', n', o', p') = mix (m,n,o,p) z s r
+group (a,b,c,d, e,f,g,h, i,j,k,l, m,n,o,p) (w,x,y,z) rd rb =
+  let (a', b', c', d') = mix (a,b,c,d) w rd rb
+      (e', f', g', h') = mix (e,f,g,h) x rd rb
+      (i', j', k', l') = mix (i,j,k,l) y rd rb
+      (m', n', o', p') = mix (m,n,o,p) z rd rb
    in (a',b',c',d', e',f',g',h', i',j',k',l', m',n',o',p')
 
 -- A single round of the hash function
@@ -124,7 +124,7 @@ toHex :: Hash -> String
 toHex h = concat $ map (hexWord . byteSwap) (toList h)
 
 chop :: Int -> [a] -> [[a]]
-chop n [] = []
+chop _ [] = []
 chop n xs = take n xs : chop n (drop n xs)
 
 fromHex :: String -> Maybe Hash
