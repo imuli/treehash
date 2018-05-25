@@ -24,6 +24,28 @@ The prototype are straight-forward:
 
   Render 8 words of hash as hexdecimal in `out`.
 
+### Haskell
+
+The Haskell implementation may be found in `Blake2s1.hs`.
+
+* `Hash` is the type of a Hash
+* `zero` is the empty hash
+* `Salt` is a 4-tuple of `Word32`s
+* `hash :: Hash -> Hash -> Salt -> Hash` hashes to `Hash`es and a `Salt` into a new `Hash`
+* `toHex :: Hash -> String` makes a hex string
+* `fromHex :: String -> Maybe Hash` reads a hexstring
+* `toList :: Hash -> [Word32]` breaks out the `Word32`s of a `Hash` into a list
+* `fromList :: [Word32] -> maybe Hash` reads suffcient `Word32`s into a `Hash`
+
+An example to hash the structure of two trees.
+
+```haskell
+data Tree t = Branch (Tree t) (Tree t) | Leaf t
+structuralHash :: Tree t -> Hash
+structuralHash (Leaf _) = hash zero zero (0,0,0,1)
+structuralHash (Branch left right) = hash (structuralHash left) (structuralHash right) (0,0,0,0)
+```
+
 ### Javascript
 
 A javascript implementation may be found in `blake2s1.js`.
@@ -62,13 +84,15 @@ var hex = blake2s1.toHex(hashtree(theTree));
 
 Performance may be tested with `make perf` or by loading `perf/index.html`.
 
-|    Processor    | Environment  | Lang |   Hash   | MH/s | MB/s |
-| --------------- | ------------ | ---- | -------- | ---- | ---- |
-| i5-3337U 1.8GHz | clang v3.9.1 | C    | blake2s1 | 5.00 | 320  |
-| i5-3337U 1.8GHz | node v6.9.5  | js   | blake2s1 | 3.51 | 225  |
-| E5-2603 1.6GHz  | clang v3.7.1 | C    | blake2s1 | 3.45 | 220  |
-| i5-3337U 1.8GHz | Chromium 61  | js   | blake2s1 | 3.05 | 196  |
-| E5-2603 1.6GHz  | node v4.6.0  | js   | blake2s1 | 2.37 | 152  |
+|    Processor    | Environment  | Lang    |   Hash   | MH/s | MB/s |
+| --------------- | ------------ | ------- | -------- | ---- | ---- |
+| i5-3337U 1.8GHz | clang v3.9.1 | C       | blake2s1 | 5.00 | 320  |
+| i5-3337U 1.8GHz | node v6.9.5  | js      | blake2s1 | 3.51 | 225  |
+| E5-2603 1.6GHz  | clang v3.7.1 | C       | blake2s1 | 3.45 | 220  |
+| i5-3337U 1.8GHz | Chromium 61  | js      | blake2s1 | 3.05 | 196  |
+| E5-2603 1.6GHz  | node v4.6.0  | js      | blake2s1 | 2.37 | 152  |
+| i5-3337U 1.8GHz | GHC v8.0.2   | Haskell | blake2s1 | 2.03 | 130  |
+| E5-2603 1.6GHz  | GHC v8.0.1   | Haskell | blake2s1 | 1.25 |  80  |
 
 ## Tests
 
