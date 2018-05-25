@@ -6,6 +6,7 @@ module Blake2s1
   , toList
   , fromList
   , toHex
+  , fromHex
   ) where
 
 import qualified Numeric
@@ -109,6 +110,9 @@ pad n x xs = replicate (n - length xs) x ++ xs
 hexWord :: Word32 -> String
 hexWord n = pad 8 '0' $ Numeric.showHex n ""
 
+hexRead :: String -> Word32
+hexRead s = read $ '0':'x':s
+
 toList :: Hash -> [Word32]
 toList (H a b c d e f g h) = [a,b,c,d,e,f,g,h]
 
@@ -118,6 +122,13 @@ fromList _ = Nothing
 
 toHex :: Hash -> String
 toHex h = concat $ map (hexWord . byteSwap) (toList h)
+
+chop :: Int -> [a] -> [[a]]
+chop n [] = []
+chop n xs = take n xs : chop n (drop n xs)
+
+fromHex :: String -> Maybe Hash
+fromHex = fromList . map byteSwap . map hexRead . chop 8
 
 instance Show Hash where
   showsPrec _ h = (toHex h ++)
