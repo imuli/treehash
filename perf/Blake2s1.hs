@@ -24,5 +24,5 @@ main = do
       khps = (fromIntegral n) / (sec * 1000)
       mbps :: Float
       mbps = 64 * khps / 1000
-   in putStr $ (show khps) ++ "KH/s (" ++ (show mbps) ++ " MB/s)"
+   in putStr $ (show khps) ++ "KH/s (" ++ (show mbps) ++ " MB/s)\n"
 
