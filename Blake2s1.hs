@@ -23,7 +23,7 @@ type State = ( Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, W
 type Salt = ( Word32, Word32, Word32, Word32 )
 
 (|>) :: a -> (a -> b) -> b
-(|>) x f = f x
+(|>) x f = f $! x
 
 -- half of G
 mix :: (Word32, Word32, Word32, Word32) -> Word32 -> Int -> Int -> (Word32, Word32, Word32, Word32)
@@ -33,15 +33,17 @@ mix (a,b,c,d) w rd rb =
       c' = c + d'
       b' = (b `xor` c') `rotateR` rb
    in (a',b',c',d')
+{-# INLINE mix #-}
 
 -- half of a bunch of G that don't use the same data
 group :: State -> (Word32, Word32, Word32, Word32) -> Int -> Int -> State
 group (a,b,c,d, e,f,g,h, i,j,k,l, m,n,o,p) (w,x,y,z) rd rb =
-  let (a', b', c', d') = mix (a,b,c,d) w rd rb
-      (e', f', g', h') = mix (e,f,g,h) x rd rb
-      (i', j', k', l') = mix (i,j,k,l) y rd rb
-      (m', n', o', p') = mix (m,n,o,p) z rd rb
+  let (a', b', c', d') = mix (a,b,c,d) w rd $! rb
+      (e', f', g', h') = mix (e,f,g,h) x rd $! rb
+      (i', j', k', l') = mix (i,j,k,l) y rd $! rb
+      (m', n', o', p') = mix (m,n,o,p) z rd $! rb
    in (a',b',c',d', e',f',g',h', i',j',k',l', m',n',o',p')
+{-# INLINE group #-}
 
 -- A single round of the hash function
 r :: State -> State -> State
@@ -56,6 +58,7 @@ r (m0,m1,m2,m3,m4,m5,m6,m7,m8,m9,mA,mB,mC,mD,mE,mF)
       (z0,z5,zA,zF,z1,z6,zB,zC,z2,z7,z8,zD,z3,z4,z9,zE) =
         group (y0,y5,yA,yF,y1,y6,yB,yC,y2,y7,y8,yD,y3,y4,y9,yE) (m9,mB,mD,mF) 8 7
    in (z0,z1,z2,z3,z4,z5,z6,z7,z8,z9,zA,zB,zC,zD,zE,zF)
+{-# INLINE r #-}
 
 hash :: Hash -> Hash -> Salt -> Hash
 hash (H m0 m1 m2 m3 m4 m5 m6 m7) (H m8 m9 mA mB mC mD mE mF) (s0, s1, s2, s3) =
@@ -98,7 +101,7 @@ hash (H m0 m1 m2 m3 m4 m5 m6 m7) (H m8 m9 mA mB mC mD mE mF) (s0, s1, s2, s3) =
       (0x510e527f `xor` w4 `xor` wC `xor` s0)
       (0x9b05688c `xor` w5 `xor` wD `xor` s1)
       (0x1f83d9ab `xor` w6 `xor` wE `xor` s2)
-      (0x5be0cd19 `xor` w7 `xor` wF `xor` s3)
+      $! (0x5be0cd19 `xor` w7 `xor` wF `xor` s3)
 
 byteSwap :: Word32 -> Word32
 byteSwap x =

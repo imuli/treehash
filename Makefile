@@ -41,12 +41,17 @@ test/%.hs.test: bin/test_haskell_% %.hs test/%_vectors.jsonp
 
 Cperf=$(patsubst %.c,%.c.perf,$(wildcard perf/*.c))
 JSperf=$(patsubst %.js,%.js.perf,$(wildcard perf/*.js))
+HSperf=$(patsubst %.hs,%.hs.perf,$(wildcard perf/*.hs))
 perf: cperf jsperf
 cperf: $(Cperf)
 jsperf: $(JSperf)
+hsperf: $(HSperf)
 
 bin/perf_c_%: %.c perf/%.c %.h | bin
 	$(CC) $(CFLAGS) -o $@ $*.c perf/$*.c
+
+bin/perf_haskell_%: %.hs perf/%.hs | bin
+	$(GHC) $(GHCFLAGS) -o $@ $*.hs perf/$*.hs
 
 perf/%.c.perf: bin/perf_c_%
 	@echo $* C Performance:
@@ -55,6 +60,10 @@ perf/%.c.perf: bin/perf_c_%
 perf/%.js.perf: perf/%.js %.js
 	@echo $* JS Performance:
 	@node $<
+
+perf/%.hs.perf: bin/perf_haskell_%
+	@echo $* Haskell Performance:
+	@./$<
 
 clean:
 	rm -rf bin
