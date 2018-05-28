@@ -94,8 +94,11 @@ Performance may be tested with `make perf` or by loading `perf/index.html`.
 | E5-2603 1.6GHz  | clang v3.7.1 | C       | blake2s1 | 3.45 | 220  |
 | i5-3337U 1.8GHz | Chromium 61  | js      | blake2s1 | 3.05 | 196  |
 | E5-2603 1.6GHz  | node v4.6.0  | js      | blake2s1 | 2.37 | 152  |
+| Core 2 1.0GHz   | gcc 7.2.0    | C       | blake2s1 | 2.08 | 132  |
 | i5-3337U 1.8GHz | GHC v8.0.2   | Haskell | blake2s1 | 2.03 | 130  |
 | E5-2603 1.6GHz  | GHC v8.0.1   | Haskell | blake2s1 | 1.25 |  80  |
+| Core 2 1.0GHz   | GHC v8.0.2   | Haskell | blake2s1 | 0.99 |  63  |
+| Core 2 1.0GHz   | node v8.11.2 | js      | blake2s1 | 0.53 |  34  |
 
 ## Tests
 
