@@ -9,6 +9,7 @@ module Blake2s1
   , fromHex
   ) where
 
+import qualified Data.Hashable as Hashable
 import qualified Numeric
 import Data.Bits
 import Data.Word
@@ -139,3 +140,5 @@ instance Show Hash where
 instance Ord Hash where
   compare x y = compare (toList x) (toList y)
 
+instance Hashable.Hashable Hash where
+  hashWithSalt salt (H a b c d e f g h) = (fromIntegral a) + salt
