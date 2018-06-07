@@ -137,6 +137,11 @@ fromHex = fromList . map byteSwap . map hexRead . chop 8
 instance Show Hash where
   showsPrec _ h = (toHex h ++)
 
+instance Read Hash where
+  readsPrec _ str = case fromHex $ take 64 str of
+                         Nothing -> []
+                         Just h -> [(h, drop 64 str)]
+
 instance Ord Hash where
   compare x y = compare (toList x) (toList y)
 
