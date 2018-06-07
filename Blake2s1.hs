@@ -146,4 +146,4 @@ instance Ord Hash where
   compare x y = compare (toList x) (toList y)
 
 instance Hashable.Hashable Hash where
-  hashWithSalt salt (H a b c d e f g h) = (fromIntegral a) + salt
+  hashWithSalt salt (H a _ _ _ _ _ _ _) = (fromIntegral a) + salt
