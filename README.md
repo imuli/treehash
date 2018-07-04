@@ -25,7 +25,7 @@ The prototype are straight-forward:
 
 * `void blake2s1_hex(const uint32_t hash[8], char out[64]);`
 
-  Render 8 words of hash as hexdecimal in `out`.
+  Render 8 words of hash as hexadecimal in `out`.
 
 ### Haskell
 
@@ -36,9 +36,9 @@ The Haskell implementation may be found in `Blake2s1.hs`.
 * `Salt` is a 4-tuple of `Word32`s
 * `hash :: Hash -> Hash -> Salt -> Hash` hashes to `Hash`es and a `Salt` into a new `Hash`
 * `toHex :: Hash -> String` makes a hex string
-* `fromHex :: String -> Maybe Hash` reads a hexstring
+* `fromHex :: String -> Maybe Hash` reads a hex string
 * `toList :: Hash -> [Word32]` breaks out the `Word32`s of a `Hash` into a list
-* `fromList :: [Word32] -> maybe Hash` reads suffcient `Word32`s into a `Hash`
+* `fromList :: [Word32] -> Maybe Hash` reads sufficient `Word32`s into a `Hash`
 
 An example to hash the structure of two trees.
 
@@ -67,7 +67,7 @@ A javascript implementation may be found in `blake2s1.js`.
 
 * `hexstring = blake2s1.toHex(words)`
 
-  Render a hexdecimal string suitable for displaying a hash.
+  Render a hexadecimal string suitable for displaying a hash.
 
 For example, the outline of a function to hash a tree:
 
@@ -82,6 +82,23 @@ function hashtree(tree){
 }
 var hex = blake2s1.toHex(hashtree(theTree));
 ```
+
+### Idris
+
+The Idris implementation may be found in `Blake2s1.idr`.
+
+Much like the Haskell implementation:
+
+* `Hash` is the type of a Hash
+* `zero` is the empty hash
+* `Salt` is `S` followed by 4 `Bits32`s
+* `hash :: Hash -> Hash -> Salt -> Hash` hashes to `Hash`es and a `Salt` into a new `Hash`
+* `toHex :: Hash -> String` makes a hex string
+* `fromHex :: String -> Maybe Hash` reads a hex string
+* `toVect :: Hash -> Vect 8 Bits32` breaks out the `Bits32`s of a `Hash` into a vector
+* `fromVect :: Vect 8 Bits32 -> Hash` converts a vector of `Bits32`s into a `Hash`
+
+As you can see below, the Idris performance is abysmal.
 
 ## Performance
 
@@ -99,6 +116,7 @@ Performance may be tested with `make perf` or by loading `perf/index.html`.
 | E5-2603 1.6GHz  | GHC v8.0.1   | Haskell | blake2s1 | 1.25 |  80  |
 | Core 2 1.0GHz   | GHC v8.0.2   | Haskell | blake2s1 | 0.99 |  63  |
 | Core 2 1.0GHz   | node v8.11.2 | js      | blake2s1 | 0.53 |  34  |
+| i5-3337U 1.8GHz | 1.0 gcc 6.4  | Idris   | blake2s1 | 0.01 | 0.9  |
 
 ## Tests
 
