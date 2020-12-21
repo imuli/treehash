@@ -1,9 +1,13 @@
 {-# OPTIONS_GHC -Wall #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
 module Data.Treehash.Treehash
   ( Treehash(..)
   , Treehashable(..)
+  , Treehashable1(..)
   , Salt(..)
   ) where
 
@@ -18,6 +22,8 @@ data Salt = Salt Word32 Word32 Word32 Word32
 class Serialize h => Treehash h where
   zero :: h
   hash :: h -> h -> Salt -> h
+  hashLen :: Int
+  hashLen = BS.length $ encode $ zero @h
   to41 :: h -> ByteString
   to41 = Base41.encode41 . encode
   from41 :: ByteString -> Either String h
@@ -26,9 +32,15 @@ class Serialize h => Treehash h where
 class Treehash h => Treehashable d h where
   treehash :: d -> h
 
-instance (Treehash h, Treehashable d h) => Treehashable (Maybe d) h where
-  treehash Nothing  = zero
-  treehash (Just x) = hash zero (treehash x) $ Salt 1 0 0 0
+class Treehash h => Treehashable1 f h where
+  treehash1 :: Treehashable a h => f a -> h
+
+instance Treehash h => Treehashable1 Maybe h where
+  treehash1 Nothing  = zero
+  treehash1 (Just x) = hash zero (treehash x) $ Salt 1 0 0 0
+
+instance (Treehash h, Treehashable a h) => Treehashable (Maybe a) h where
+  treehash = treehash1
 
 instance (Treehash h, Treehashable d h) => Treehashable [d] h where
   treehash []       = zero
@@ -62,3 +74,25 @@ instance (Treehash h) => Treehashable Word8 h where
 
 instance (Treehash h) => Treehashable Bool h where
   treehash x = hash zero zero $ Salt 1 0 0 (if x then 1 else 0)
+
+halfCeiling :: Int -> Int
+halfCeiling x =
+  let a = x - 1
+      b = a .|. unsafeShiftR a 1
+      c = b .|. unsafeShiftR b 2
+      d = c .|. unsafeShiftR c 4
+      e = d .|. unsafeShiftR d 8
+      f = e .|. unsafeShiftR e 16
+   in unsafeShiftR f 1 + 1
+
+instance (Treehash h) => Treehashable ByteString h where
+  treehash x =
+    let len = BS.length x
+        size = 2 * hashLen @h
+        half = halfCeiling len
+        Right (a, b) =
+          case compare len size of
+               LT -> decode $ x <> BS.replicate size 0
+               EQ -> decode x
+               GT -> Right (treehash $ BS.take half x, treehash $ BS.drop half x)
+     in hash a b $ Salt 0 0 0 $ fromIntegral len

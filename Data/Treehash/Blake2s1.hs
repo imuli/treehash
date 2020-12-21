@@ -11,7 +11,7 @@ import           Data.Serialize
 import           Data.Treehash.Treehash
 import           Data.Word
 
-data Blake2s1 = H Word32 Word32 Word32 Word32 Word32 Word32 Word32 Word32
+data Blake2s1 = H !Word32 !Word32 !Word32 !Word32 !Word32 !Word32 !Word32 !Word32
   deriving (Eq)
 
 type State = ( Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32 )
@@ -95,7 +95,7 @@ blake2s1 (H m0 m1 m2 m3 m4 m5 m6 m7) (H m8 m9 mA mB mC mD mE mF) (Salt s0 s1 s2 
       (0x510e527f `xor` w4 `xor` wC `xor` s0)
       (0x9b05688c `xor` w5 `xor` wD `xor` s1)
       (0x1f83d9ab `xor` w6 `xor` wE `xor` s2)
-      $! (0x5be0cd19 `xor` w7 `xor` wF `xor` s3)
+      (0x5be0cd19 `xor` w7 `xor` wF `xor` s3)
 
 instance Serialize Blake2s1 where
   get =
