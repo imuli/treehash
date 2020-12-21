@@ -1,17 +1,19 @@
 {-#OPTIONS_GHC -Wall #-}
 
-module Main (main) where
+module Main
+  ( main
+  ) where
 
-import Blake2s1
-import Data.Time.Clock
+import           Data.Time.Clock
+import           Data.Treehash
 
 -- how deep to go
 n :: Int
 n = 1000000
 
-getHash :: Int -> Hash -> Hash
+getHash :: Int -> Blake2s1 -> Blake2s1
 getHash 0 prev = prev
-getHash m prev = getHash (m-1) $! hash prev prev (0,0,0,0)
+getHash m prev = getHash (m-1) $! hash prev prev (Salt 0 0 0 0)
 
 main :: IO ()
 main = do
