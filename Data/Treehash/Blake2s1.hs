@@ -1,29 +1,20 @@
-module Blake2s1
-  ( Hash(..)
-  , Salt
-  , zero
-  , hash
+{-# OPTIONS_GHC -Wall #-}
+module Data.Treehash.Blake2s1
+  ( Blake2s1(..)
   , toList
   , fromList
-  , toHex
-  , fromHex
   ) where
 
-import qualified Data.Hashable as Hashable
-import qualified Numeric
-import Data.Bits
-import Data.Word
-import Data.Maybe (listToMaybe, catMaybes)
-import Data.Char (isSpace)
+import           Data.Bits
+import           Data.Hashable (Hashable(hashWithSalt))
+import           Data.Serialize
+import           Data.Treehash.Treehash
+import           Data.Word
 
-data Hash = H Word32 Word32 Word32 Word32 Word32 Word32 Word32 Word32
-  deriving Eq
-
-zero :: Hash
-zero = H 0 0 0 0 0 0 0 0
+data Blake2s1 = H Word32 Word32 Word32 Word32 Word32 Word32 Word32 Word32
+  deriving (Eq)
 
 type State = ( Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32 )
-type Salt = ( Word32, Word32, Word32, Word32 )
 
 (|>) :: a -> (a -> b) -> b
 (|>) x f = f $! x
@@ -63,8 +54,8 @@ r (m0,m1,m2,m3,m4,m5,m6,m7,m8,m9,mA,mB,mC,mD,mE,mF)
    in (z0,z1,z2,z3,z4,z5,z6,z7,z8,z9,zA,zB,zC,zD,zE,zF)
 {-# INLINE r #-}
 
-hash :: Hash -> Hash -> Salt -> Hash
-hash (H m0 m1 m2 m3 m4 m5 m6 m7) (H m8 m9 mA mB mC mD mE mF) (s0, s1, s2, s3) =
+blake2s1 :: Blake2s1 -> Blake2s1 -> Salt -> Blake2s1
+blake2s1 (H m0 m1 m2 m3 m4 m5 m6 m7) (H m8 m9 mA mB mC mD mE mF) (Salt s0 s1 s2 s3) =
   let v0 = 0x6b08e647 -- 0x6a09e667 ^ 0x01010020, no key and digest length of 32 bytes
       v1 = 0xbb67ae85 -- no leaf length
       v2 = 0x3c6ef372 -- no node offset
@@ -106,47 +97,43 @@ hash (H m0 m1 m2 m3 m4 m5 m6 m7) (H m8 m9 mA mB mC mD mE mF) (s0, s1, s2, s3) =
       (0x1f83d9ab `xor` w6 `xor` wE `xor` s2)
       $! (0x5be0cd19 `xor` w7 `xor` wF `xor` s3)
 
-byteSwap :: Word32 -> Word32
-byteSwap x =
-  (x `shiftR` 24) .|. ((x `shiftR` 8) .&. 0x0000ff00) .|. ((x `shiftL` 8) .&. 0x00ff0000) .|. (x `shiftL` 24)
+instance Serialize Blake2s1 where
+  get =
+    do a <- getWord32le
+       b <- getWord32le
+       c <- getWord32le
+       d <- getWord32le
+       e <- getWord32le
+       f <- getWord32le
+       g <- getWord32le
+       h <- getWord32le
+       pure $ H a b c d e f g h
+  put (H a b c d e f g h) =
+    do putWord32le a
+       putWord32le b
+       putWord32le c
+       putWord32le d
+       putWord32le e
+       putWord32le f
+       putWord32le g
+       putWord32le h
 
-pad :: Int -> a -> [a] -> [a]
-pad n x xs = replicate (n - length xs) x ++ xs
+instance Treehash Blake2s1 where
+  zero = H 0 0 0 0 0 0 0 0
+  hash = blake2s1
 
-hexWord :: Word32 -> String
-hexWord n = pad 8 '0' $ Numeric.showHex n ""
-
-hexRead :: Integral t => String -> Maybe t
-hexRead = fmap fst . listToMaybe . Numeric.readHex
-
-toList :: Hash -> [Word32]
+toList :: Blake2s1 -> [Word32]
 toList (H a b c d e f g h) = [a,b,c,d,e,f,g,h]
 
-fromList :: [Word32] -> Maybe Hash
+fromList :: [Word32] -> Maybe Blake2s1
 fromList [a,b,c,d,e,f,g,h] = Just (H a b c d e f g h)
-fromList _ = Nothing
+fromList _                 = Nothing
 
-toHex :: Hash -> String
-toHex h = concat $ map (hexWord . byteSwap) (toList h)
+instance Show Blake2s1 where
+  showsPrec _ h = ("Blake2s1 " <> show (to41 h) ++)
 
-chop :: Int -> [a] -> [[a]]
-chop _ [] = []
-chop n xs = take n xs : chop n (drop n xs)
+instance Ord Blake2s1 where
+  compare x y = compare (map byteSwap32 $ toList x) (map byteSwap32 $ toList y)
 
-fromHex :: String -> Maybe Hash
-fromHex = fromList . map byteSwap . catMaybes . map hexRead . chop 8
-
-instance Show Hash where
-  showsPrec _ h = (toHex h ++)
-
-instance Read Hash where
-  readsPrec _ xs = let str = dropWhile isSpace xs
-                    in case fromHex $ take 64 str of
-                         Nothing -> []
-                         Just h -> [(h, drop 64 str)]
-
-instance Ord Hash where
-  compare x y = compare (toList x) (toList y)
-
-instance Hashable.Hashable Hash where
-  hashWithSalt salt (H a _ _ _ _ _ _ _) = (fromIntegral a) + salt
+instance Hashable Blake2s1 where
+  hashWithSalt salt (H a b _ _ _ _ _ _) = hashWithSalt salt (b, a)

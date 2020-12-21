@@ -1,0 +1,26 @@
+name: treehash
+version: 0.1.0.0
+synopsis: Hash functions specialized for trees
+maintainer: Imuli <i@imu.li>
+github: imuli/sorska
+license: NONE
+
+ghc-options: -Wall
+
+dependencies:
+  - base
+  - bases
+  - bytestring
+  - cereal
+  - hashable
+
+library:
+  source-dirs: .
+
+tests:
+  blake2s1:
+    main: Blake2s1.hs
+    source-dirs: test
+    dependencies:
+      - treehash
+      - text

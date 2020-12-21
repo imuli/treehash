@@ -1,0 +1,54 @@
+cabal-version: 2.2
+
+-- This file has been generated from package.yaml by hpack version 0.34.2.
+--
+-- see: https://github.com/sol/hpack
+
+name:           treehash
+version:        0.1.0.0
+synopsis:       Hash functions specialized for trees
+homepage:       https://github.com/imuli/sorska#readme
+bug-reports:    https://github.com/imuli/sorska/issues
+maintainer:     Imuli <i@imu.li>
+license:        NONE
+build-type:     Simple
+
+source-repository head
+  type: git
+  location: https://github.com/imuli/sorska
+
+library
+  exposed-modules:
+      Data.Treehash
+      Data.Treehash.Blake2s1
+      Data.Treehash.Treehash
+  other-modules:
+      Paths_treehash
+  hs-source-dirs:
+      ./.
+  ghc-options: -Wall
+  build-depends:
+      base
+    , bases
+    , bytestring
+    , cereal
+    , hashable
+  default-language: Haskell2010
+
+test-suite blake2s1
+  type: exitcode-stdio-1.0
+  main-is: Blake2s1.hs
+  other-modules:
+      Paths_treehash
+  hs-source-dirs:
+      test
+  ghc-options: -Wall
+  build-depends:
+      base
+    , bases
+    , bytestring
+    , cereal
+    , hashable
+    , text
+    , treehash
+  default-language: Haskell2010
