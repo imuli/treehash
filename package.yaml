@@ -1,5 +1,5 @@
 name: treehash
-version: 0.1.0.0
+version: 0.1.1.0
 synopsis: Hash functions specialized for trees
 maintainer: Imuli <i@imu.li>
 github: imuli/sorska
