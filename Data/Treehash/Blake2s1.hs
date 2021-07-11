@@ -1,4 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric #-}
 module Data.Treehash.Blake2s1
   ( Blake2s1(..)
   , toList
@@ -6,13 +8,20 @@ module Data.Treehash.Blake2s1
   ) where
 
 import           Data.Bits
+import           Data.Data (Data)
 import           Data.Hashable (Hashable(hashWithSalt))
 import           Data.Serialize
 import           Data.Treehash.Treehash
 import           Data.Word
+import           Flat (Flat, decode, encode, size)
+import           Flat.Decoder.Prim (dBE32)
+import           Flat.Encoder.Prim (eWord32BEF)
+import           Flat.Encoder.Strict (Encoding(Encoding))
+import           GHC.Generics (Generic)
+import           Text.Read (Lexeme(Ident), lexP, parens, readPrec)
 
 data Blake2s1 = H !Word32 !Word32 !Word32 !Word32 !Word32 !Word32 !Word32 !Word32
-  deriving (Eq)
+  deriving (Data, Eq, Generic)
 
 type State = ( Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32, Word32 )
 
@@ -118,6 +127,20 @@ instance Serialize Blake2s1 where
        putWord32le g
        putWord32le h
 
+instance Flat Blake2s1 where
+  encode = foldMap (Encoding . eWord32BEF . byteSwap32) . toList
+  decode = do
+    a <- byteSwap32 <$> dBE32
+    b <- byteSwap32 <$> dBE32
+    c <- byteSwap32 <$> dBE32
+    d <- byteSwap32 <$> dBE32
+    e <- byteSwap32 <$> dBE32
+    f <- byteSwap32 <$> dBE32
+    g <- byteSwap32 <$> dBE32
+    h <- byteSwap32 <$> dBE32
+    pure $ H a b c d e f g h
+  size _ = (+256)
+
 instance Treehash Blake2s1 where
   zero = H 0 0 0 0 0 0 0 0
   hash = blake2s1
@@ -131,6 +154,13 @@ fromList _                 = Nothing
 
 instance Show Blake2s1 where
   showsPrec _ h = ("Blake2s1 " <> show (to41 h) ++)
+
+instance Read Blake2s1 where
+  readPrec = parens $ do
+    Ident ct <- lexP
+    case ct of
+      "Blake2s1" -> either fail pure . from41 =<< readPrec
+      x          -> fail $ "Expected Blake2s1, got: " <> x
 
 instance Ord Blake2s1 where
   compare x y = compare (map byteSwap32 $ toList x) (map byteSwap32 $ toList y)

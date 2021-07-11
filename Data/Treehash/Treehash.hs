@@ -11,22 +11,24 @@ module Data.Treehash.Treehash
   , Salt(..)
   ) where
 
-import           Data.Bits
-import           Data.ByteString as BS
+import           Data.Bifunctor (bimap)
+import           Data.Bits (Bits, shiftR, unsafeShiftR, (.|.))
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Encoding.Base41 as Base41
 import           Data.Serialize
 import           Data.Word
 
 data Salt = Salt Word32 Word32 Word32 Word32
 
-class Serialize h => Treehash h where
+class (Eq h, Ord h, Show h, Serialize h) => Treehash h where
   zero :: h
   hash :: h -> h -> Salt -> h
-  hashLen :: Int
-  hashLen = BS.length $ encode $ zero @h
-  to41 :: h -> ByteString
+  hashLen :: Num n => n
+  hashLen = fromIntegral $ BS.length $ encode $ zero @h
+  to41 :: h -> BS.ByteString
   to41 = Base41.encode41 . encode
-  from41 :: ByteString -> Either String h
+  from41 :: BS.ByteString -> Either String h
   from41 = decode . Base41.decode41Lenient
 
 class Treehash h => Treehashable d h where
@@ -75,7 +77,7 @@ instance (Treehash h) => Treehashable Word8 h where
 instance (Treehash h) => Treehashable Bool h where
   treehash x = hash zero zero $ Salt 1 0 0 (if x then 1 else 0)
 
-halfCeiling :: Int -> Int
+halfCeiling :: (Bits n, Num n) => n -> n
 halfCeiling x =
   let a = x - 1
       b = a .|. unsafeShiftR a 1
@@ -85,7 +87,7 @@ halfCeiling x =
       f = e .|. unsafeShiftR e 16
    in unsafeShiftR f 1 + 1
 
-instance (Treehash h) => Treehashable ByteString h where
+instance (Treehash h) => Treehashable BS.ByteString h where
   treehash x =
     let len = BS.length x
         size = 2 * hashLen @h
@@ -94,5 +96,17 @@ instance (Treehash h) => Treehashable ByteString h where
           case compare len size of
                LT -> decode $ x <> BS.replicate size 0
                EQ -> decode x
-               GT -> Right (treehash $ BS.take half x, treehash $ BS.drop half x)
+               GT -> Right $ bimap treehash treehash $ BS.splitAt half x
+     in hash a b $ Salt 0 0 0 $ fromIntegral len
+
+instance (Treehash h) => Treehashable LBS.ByteString h where
+  treehash x =
+    let len = LBS.length x
+        size = 2 * hashLen @h
+        half = halfCeiling len
+        Right (a, b) =
+          case compare len size of
+               LT -> decode $ LBS.toStrict $ x <> LBS.replicate size 0
+               EQ -> decode $ LBS.toStrict x
+               GT -> Right $ bimap treehash treehash $ LBS.splitAt half x
      in hash a b $ Salt 0 0 0 $ fromIntegral len
